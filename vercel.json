@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/assets/:pre*/node_modules/:post*", "destination": "/assets/:pre*/nm/:post*" },
+    { "source": "/assets/__node_modules/:rest*/:file", "destination": "/media/:file" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
