@@ -34,4 +34,19 @@ cat > vercel.json <<'JSON'
   ]
 }
 JSON
-echo "Wrote vercel.json (font rewrite + SPA catch-all). Ready to commit + push."
+echo "Wrote vercel.json (font rewrite + SPA catch-all)."
+
+# iOS-Safari viewport fix (Expo's `output: single` ignores app/+html.tsx, so we
+# patch the generated index.html here — idempotent):
+#  - viewport-fit=cover  → makes env(safe-area-inset-*) non-zero so the tab bar
+#    and footers can clear the home indicator (useSafeAreaInsets).
+#  - height: 100dvh      → fit the actually-visible viewport, so the bottom of
+#    the app isn't hidden behind Safari's bottom toolbar.
+if grep -q "viewport-fit=cover" index.html; then
+  echo "index.html already patched for iOS safe-area."
+else
+  sed -i '' 's|shrink-to-fit=no"|shrink-to-fit=no, viewport-fit=cover"|' index.html
+  sed -i '' 's|</head>|<style>html,body{height:100dvh}#root{display:flex;flex:1;height:100dvh}</style></head>|' index.html
+  echo "Patched index.html (viewport-fit=cover + 100dvh)."
+fi
+echo "Ready to commit + push."
